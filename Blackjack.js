@@ -136,6 +136,7 @@ function setupRound() {
 	document.getElementById("dealer-total").innerHTML = "Dealer Total: " + "?";
 	document.getElementById("dealer-cards").innerHTML = "<img class=\"card\" src=\"Images/Card_Back.png\" alt=\"\" /><img class=\"card\" src=\"Images/Card_Back.png\" alt=\"\" />";
 	
+	document.getElementById("player-credits").innerHTML = "Player Credits: " + playerCredits;
 	document.getElementById("player-total").innerHTML = "Player Total: ?";
 	document.getElementById("player-bet").innerHTML = "Player Bet: ?";
 	document.getElementById("player-cards").innerHTML = "<img class=\"card\" src=\"Images/Card_Back.png\" alt=\"\" /><img class=\"card\" src=\"Images/Card_Back.png\" alt=\"\" />";
@@ -476,6 +477,8 @@ function staySplitHand2() {
 }
 
 function judgeWinSplitHands() {
+	document.getElementById("player-split-hand2").className = "";
+
 	if (dealerBlackjack || (playerSplitHand1Total < dealerTotal && !dealerBust) || playerSplitHand1Bust) {
 		document.getElementById("text-output").innerHTML = "Player Loses Hand 1!";
 		playerCredits -= (bet / 2);
