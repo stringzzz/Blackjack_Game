@@ -1,0 +1,75 @@
+/*
+Blackjack game 
+By stringzzz, Ghostwarez Co.
+4-22-2023
+*/
+
+#game-table {
+	width: 70%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+	background-color: RGB(40, 160, 60);
+	background-image: linear-gradient(RGB(10, 130, 30), RGB(20, 165, 65));
+	border: 3px solid RGB(10, 75, 20);
+	font-size: 1.5vw;
+	padding: 2% 0;
+}
+
+.cards {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.card {
+	width: 40%;
+	margin: 0 2%;
+}
+
+p {
+	margin: 0;
+	margin-bottom: 2%;
+}
+
+#player-total {
+	margin-top: 10%;
+}
+
+#buttons {
+	width: 30%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.button {
+	font-size: 1.2vw;
+	background-color: RGB(40, 230, 100);
+	background-image: linear-gradient(RGB(20, 180, 60), RGB(40, 230, 100));
+	border: 1px solid RGB(0, 80, 10);
+}
+
+#text-output {
+	margin-top: 3%;
+}
+
+#bet-input {
+	width: 50%;
+	font-size: 1.2vw;
+}
+
+#player-split-hand1, #player-split-hand2 {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin: 0 5%;
+}
+
+.current-hand {
+	border: 1px solid RGB(20, 50, 100);
+}
+
+

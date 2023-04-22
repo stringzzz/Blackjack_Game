@@ -1,0 +1,44 @@
+<!--
+Blackjack game 
+By stringzzz, Ghostwarez Co.
+4-22-2023
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <title>Blackjack Game</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Blackjack.css" />
+    <script src="Blackjack.js"></script>
+  </head>
+  
+  <body>
+  
+    <div id="game-table">
+    
+    	<p id="dealer-total">Dealer Total: ?</p>
+    	<div class="cards" id="dealer-cards">
+    	  <img class="card" src="Images/Card_Back.png" alt="" />
+    	  <img class="card" src="Images/Card_Back.png" alt="" />
+    	</div>
+    	
+    	<p id="player-total">Player Total: ?</p>
+    	<p id="player-credits">Player Credits: 20</p>
+    	<p id ="player-bet">Current Bet: ?</p>
+    	<div class="cards" id="player-cards">
+    	  <img class="card" src="Images/Card_Back.png" alt="" />
+    	  <img class="card" src="Images/Card_Back.png" alt="" />
+    	</div>
+    	
+    	<p id="text-output"></p>
+    	<div id="buttons">
+          <button class="button" onclick="setupRound();">Start Game</button>
+    	</div>
+    </div>
+    
+  </body>
+  
+</html>
