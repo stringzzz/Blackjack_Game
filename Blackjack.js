@@ -181,7 +181,13 @@ function placeBet() {
 	}
 	document.getElementById("player-cards").innerHTML += "<img class=\"card\" src=\"" + playerCard2.file + "\" alt=\"\" />";
 	
+	
+	
 	playerTotal = playerCard1.value + playerCard2.value;
+	while ((playerTotal > 21) && (playerAces > 0)) {
+		playerTotal -= 10;
+		playerAces--;
+	}
 	document.getElementById("player-total").innerHTML = "Player Total: " + playerTotal;
 	
 	document.getElementById("text-output").innerHTML = "Player bet " + bet;
@@ -395,6 +401,10 @@ function splitHand() {
 		playerSplitHand1Aces++;
 	}
 	document.getElementById("player-split-hand1").innerHTML = "<img class=\"card\" src=\"" + playerSplitHand1[0].file + "\" alt=\"\" /><img class=\"card\" src=\"" + playerSplitHand1[1].file + "\" alt=\"\" />";
+	while ((playerSplitHand1Total > 21) && (playerSplitHand1Aces > 0)) {
+		playerSplitHand1Total -= 10;
+		playerSplitHand1Aces--;
+	}
 	
 	playerSplitHand2.push(playerHand[1]);
 	if (playerSplitHand2[0].name == "Ace") {
@@ -407,8 +417,12 @@ function splitHand() {
 		playerSplitHand2Aces++;
 	}
 	document.getElementById("player-split-hand2").innerHTML = "<img class=\"card\" src=\"" + playerSplitHand2[0].file + "\" alt=\"\" /><img class=\"card\" src=\"" + playerSplitHand2[1].file + "\" alt=\"\" />";
+	while ((playerSplitHand2Total > 21) && (playerSplitHand2Aces > 0)) {
+		playerSplitHand2Total -= 10;
+		playerSplitHand2Aces--;
+	}
 	
-	document.getElementById("player-total").innerHTML = "Hand 1 Total: " + playerSplitHand1Total + " Hand 2 Total: " + playerSplitHand2Total;
+	document.getElementById("player-total").innerHTML = "Hand 1 Total: " + playerSplitHand1Total + " | Hand 2 Total: " + playerSplitHand2Total;
 	
 	document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"hitSplitHand1();\">Hit Hand 1</button><button class=\"button\" onclick=\"staySplitHand1();\">Stay Hand 1</button>";
 }
@@ -427,7 +441,7 @@ function hitSplitHand1() {
 		playerSplitHand1Total -= 10;
 		playerSplitHand1Aces--;
 	}
-	document.getElementById("player-total").innerHTML = "Hand 1 Total: " + playerSplitHand1Total + " Hand 2 Total: " + playerSplitHand2Total;
+	document.getElementById("player-total").innerHTML = "Hand 1 Total: " + playerSplitHand1Total + " | Hand 2 Total: " + playerSplitHand2Total;
 	
 	if (playerSplitHand1Total > 21) {
 		playerSplitHand1Bust = true;
@@ -462,7 +476,7 @@ function hitSplitHand2() {
 		playerSplitHand2Total -= 10;
 		playerSplitHand2Aces--;
 	}
-	document.getElementById("player-total").innerHTML = "Hand 1 Total: " + playerSplitHand1Total + " Hand 2 Total: " + playerSplitHand2Total;
+	document.getElementById("player-total").innerHTML = "Hand 1 Total: " + playerSplitHand1Total + " | Hand 2 Total: " + playerSplitHand2Total;
 	
 	if (playerSplitHand2Total > 21) {
 		playerSplitHand2Bust = true;
