@@ -2,6 +2,8 @@
 Blackjack game 
 By stringzzz, Ghostwarez Co.
 4-22-2023
+
+Modified on 4-29-2023
 */
 
 #game-table {
@@ -38,7 +40,7 @@ p {
 }
 
 #buttons {
-	width: 30%;
+	width: 40%;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -71,5 +73,4 @@ p {
 .current-hand {
 	border: 1px solid RGB(20, 50, 100);
 }
-
 
