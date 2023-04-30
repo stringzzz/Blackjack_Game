@@ -2,6 +2,8 @@
 Blackjack game 
 By stringzzz, Ghostwarez Co.
 4-22-2023
+
+4-29-2023: Added insurance option for if dealer is showing an Ace at start
 */
 
 var deck = [
@@ -106,6 +108,9 @@ var dealerRevealed = false;
 var dealerBust = false;
 var dealerAces = 0;
 var bet = "?";
+var insuranceBet = 0;
+var insuranceBetHand1 = 0;
+var insuranceBetHand2 = 0;
 
 function setupRound() {
 	cardsDrawn = [];
@@ -132,6 +137,9 @@ function setupRound() {
 	dealerBust = false;
 	dealerAces = 0;
 	bet = "?";
+	insuranceBet = 0;
+	insuranceBetHand1 = 0;
+	insuranceBetHand2 = 0;
 	
 	document.getElementById("dealer-total").innerHTML = "Dealer Total: " + "?";
 	document.getElementById("dealer-cards").innerHTML = "<img class=\"card\" src=\"Images/Card_Back.png\" alt=\"\" /><img class=\"card\" src=\"Images/Card_Back.png\" alt=\"\" />";
@@ -160,10 +168,13 @@ function placeBet() {
 		document.getElementById("text-output").innerHTML = "Alright, I'll let you play this round with no bet...";
 	}
 	
+	document.getElementById("text-output").innerHTML = "";
+	
 	var dealerCard = drawCard();
 	dealerHand.push(dealerCard);
 	if (dealerCard.name == "Ace") {
 		dealerAces++;
+		document.getElementById("text-output").innerHTML = "Dealer is showing an Ace! ";
 	}
 	document.getElementById("dealer-cards").innerHTML = "<img class=\"card\" src=\"" + dealerCard.file + "\" alt=\"\" /><img class=\"card\" src=\"Images/Card_Back.png\" alt=\"\" />";
 	
@@ -190,18 +201,24 @@ function placeBet() {
 	}
 	document.getElementById("player-total").innerHTML = "Player Total: " + playerTotal;
 	
-	document.getElementById("text-output").innerHTML = "Player bet " + bet;
-	document.getElementById("player-bet").innerHTML = "Current Bet: " + bet;
+	document.getElementById("text-output").innerHTML += "Player bet " + bet;
+	document.getElementById("player-bet").innerHTML = "Current Bet: " + (bet + insuranceBet);
 	document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"hit();\">Hit</button><button class=\"button\" onclick=\"stay();\">Stay</button><button class=\"button\" onclick=\"doubleDown();\">Double Down</button>";
-	
-	if (playerHand[0].name == playerHand[1].name) {
-		document.getElementById("buttons").innerHTML += "<button class=\"button\" onclick=\"splitHand();\">Split Hand</button>";
-	}
 	
 	if (playerTotal == 21) {
 		document.getElementById("text-output").innerHTML = "Player Blackjack!";
 		playerBlackjack = true;
 		document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"dealerTurn();\">Continue</button>";
+		return;
+	}
+	
+	if (playerHand[0].name == playerHand[1].name) {
+		document.getElementById("buttons").innerHTML += "<button class=\"button\" onclick=\"splitHand();\">Split Hand</button>";
+		return;
+	}
+	
+	if (dealerAces == 1) {
+		document.getElementById("buttons").innerHTML += "<button class=\"button\" onclick=\"buyInsurance()\">Buy Insurance</button>";
 	}
 }
 
@@ -244,7 +261,7 @@ function doubleDown() {
 	}
 	
 	bet *= 2;
-	document.getElementById("player-bet").innerHTML = "Current Bet: " + bet;
+	document.getElementById("player-bet").innerHTML = "Current Bet: " + (bet + insuranceBet);
 	var playerCard1 = drawCard();
 	playerHand.push(playerCard1);
 	if (playerCard1.name == "Ace") {
@@ -271,11 +288,30 @@ function doubleDown() {
 	document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"dealerTurn();\">Continue</button>";	
 }
 
+function buyInsurance() {
+	if (playerCredits < (bet + Math.ceil(bet / 2))) {
+		document.getElementById("text-output").innerHTML = "Insufficient credits to buy insurance.";
+		return;
+	}
+	
+	document.getElementById("text-output").innerHTML = "Player bought insurance by betting an additional half their bet.";
+	insuranceBet = Math.ceil(bet / 2);
+	document.getElementById("player-bet").innerHTML = "Current Bet: " + (bet + insuranceBet);
+	
+	document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"hit();\">Hit</button><button class=\"button\" onclick=\"stay();\">Stay</button><button class=\"button\" onclick=\"doubleDown();\">Double Down</button>";
+}
+
 function dealerTurn() {
 	if (!dealerRevealed) {
 		dealerRevealed = true;
 		var dealerCard2 = drawCard();
 		dealerHand.push(dealerCard2);
+		
+		while ((dealerTotal > 21) && (dealerAces > 0)) {
+			dealerTotal -= 10;
+			dealerAces--;
+		}
+		
 		if (dealerCard2.name == "Ace") {
 			dealerAces++;
 		}
@@ -354,9 +390,19 @@ function judgeWin() {
 			document.getElementById("player-credits").innerHTML = "Player Credits: " + playerCredits;
 		}
 	}
+	else if (dealerBlackjack && insuranceBet != 0) {
+		if (dealerHand[0].name == "Ace") {
+			document.getElementById("text-output").innerHTML = "Player got back the insurance!";
+			document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"setupRound();\">Next Round</button>";
+			return;
+		}
+	}
 	else if (dealerBlackjack || (playerTotal < dealerTotal && !dealerBust) || playerBust) {
 		document.getElementById("text-output").innerHTML = "Player Loses!";
 		playerCredits -= bet;
+		if (insuranceBet != "?") {
+			playerCredits -= insuranceBet;
+		}
 		document.getElementById("player-credits").innerHTML = "Player Credits: " + playerCredits;
 		
 		if (playerCredits == 0) {
@@ -386,7 +432,7 @@ function splitHand() {
 		return;
 	}
 	bet *= 2;
-	document.getElementById("player-bet").innerHTML = "Current Bet: " + bet + " (Total for both hands)";
+	document.getElementById("player-bet").innerHTML = "Current Bet: " + (bet + insuranceBetHand1 + insuranceBetHand2) + " (Total for both hands)";
 	
 	document.getElementById("player-cards").innerHTML = "<div class=\"current-hand\" id=\"player-split-hand1\"></div><div class=\"\" id=\"player-split-hand2\"></div>";
 	
@@ -425,6 +471,10 @@ function splitHand() {
 	document.getElementById("player-total").innerHTML = "Hand 1 Total: " + playerSplitHand1Total + " | Hand 2 Total: " + playerSplitHand2Total;
 	
 	document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"hitSplitHand1();\">Hit Hand 1</button><button class=\"button\" onclick=\"staySplitHand1();\">Stay Hand 1</button>";
+	
+	if (dealerAces == 1) {
+		document.getElementById("buttons").innerHTML += "<button class=\"button\" onclick=\"buyInsuranceHand1()\">Buy Insurance Hand 1</button>";
+	}
 }
 
 function hitSplitHand1() {
@@ -455,11 +505,28 @@ function staySplitHand1() {
 	document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"setupHand2();\">Continue</button>";
 }
 
+function buyInsuranceHand1() {
+	if (playerCredits < (bet + Math.ceil((bet/2) / 2))) {
+		document.getElementById("text-output").innerHTML = "Insufficient credits to buy insurance for hand 1.";
+		return;
+	}
+	
+	document.getElementById("text-output").innerHTML = "Player bought insurance for hand 1 by betting an additional half their bet.";
+	insuranceBetHand1 = Math.ceil((bet/2) / 2);
+	document.getElementById("player-bet").innerHTML = "Current Bet: " + (bet + insuranceBetHand1 + insuranceBetHand2) + " (Total for both hands)";
+	
+	document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"hitSplitHand1();\">Hit Hand 1</button><button class=\"button\" onclick=\"staySplitHand1();\">Stay Hand 1</button><button class=\"button\" onclick=\"doubleDownSplitHand1();\">Double Down Hand 1</button>";
+}
+
 function setupHand2() {
 	document.getElementById("player-split-hand1").className = "";
 	document.getElementById("player-split-hand2").className = "current-hand";
 	
 	document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"hitSplitHand2();\">Hit Hand 2</button><button class=\"button\" onclick=\"staySplitHand2();\">Stay Hand 2</button>";
+	
+	if (dealerAces == 1) {
+		document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"buyInsuranceHand2()\">Buy Insurance Hand 2</button>";
+	}
 }
 
 function hitSplitHand2() {
@@ -490,12 +557,30 @@ function staySplitHand2() {
 	document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"dealerTurn();\">Continue</button>";
 }
 
+function buyInsuranceHand2() {
+	if (playerCredits < (bet + Math.ceil((bet/2)  / 2))) {
+		document.getElementById("text-output").innerHTML = "Insufficient credits to buy insurance for hand 2.";
+		return;
+	}
+	
+	document.getElementById("text-output").innerHTML = "Player bought insurance for hand 2 by betting an additional half their bet.";
+	insuranceBetHand2 = Math.ceil((bet/2) / 2);
+	document.getElementById("player-bet").innerHTML = "Current Bet: " + (bet + insuranceBetHand1 + insuranceBetHand2) + " (Total for both hands)";
+	
+	document.getElementById("buttons").innerHTML = "<button class=\"button\" onclick=\"hitSplitHand2();\">Hit Hand 2</button><button class=\"button\" onclick=\"staySplitHand2();\">Stay Hand 2</button><button class=\"button\" onclick=\"doubleDownSplitHand2();\">Double Down Hand 2</button>";
+}
+
 function judgeWinSplitHands() {
 	document.getElementById("player-split-hand2").className = "";
-
-	if (dealerBlackjack || (playerSplitHand1Total < dealerTotal && !dealerBust) || playerSplitHand1Bust) {
+	
+	if (dealerBlackjack && insuranceBetHand1 != 0) {
+		if (dealerHand[0].name == "Ace") {
+			document.getElementById("text-output").innerHTML = "Player got back the insurance for hand 1!";
+		}
+	}
+	else if (dealerBlackjack || (playerSplitHand1Total < dealerTotal && !dealerBust) || playerSplitHand1Bust) {
 		document.getElementById("text-output").innerHTML = "Player Loses Hand 1!";
-		playerCredits -= (bet / 2);
+		playerCredits -= (bet / 2) + insuranceBetHand1;
 		document.getElementById("player-credits").innerHTML = "Player Credits: " + playerCredits;
 	}
 	else if (playerSplitHand1Total > dealerTotal || dealerBust) {
@@ -507,9 +592,14 @@ function judgeWinSplitHands() {
 		document.getElementById("text-output").innerHTML = "Push on Hand 1!";
 	}
 	
-	if (dealerBlackjack || (playerSplitHand2Total < dealerTotal && !dealerBust) || playerSplitHand2Bust) {
+	if (dealerBlackjack && insuranceBetHand2 != 0) {
+		if (dealerHand[0].name == "Ace") {
+			document.getElementById("text-output").innerHTML += " Player got back the insurance for hand 2!";
+		}
+	}
+	else if (dealerBlackjack || (playerSplitHand2Total < dealerTotal && !dealerBust) || playerSplitHand2Bust) {
 		document.getElementById("text-output").innerHTML += " Player Loses Hand 2!";
-		playerCredits -= (bet / 2);
+		playerCredits -= (bet / 2) + insuranceBetHand2;
 		document.getElementById("player-credits").innerHTML = "Player Credits: " + playerCredits;
 		
 		if (playerCredits == 0) {
